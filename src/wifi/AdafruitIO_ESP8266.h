@@ -29,6 +29,8 @@ class AdafruitIO_ESP8266 : public AdafruitIO {
 
     aio_status_t networkStatus();
     const char* connectionType();
+  
+    bool setAP(const char *ap_ssid, const char *ap_pass);
 
   protected:
     void _connect();
@@ -36,6 +38,8 @@ class AdafruitIO_ESP8266 : public AdafruitIO {
     const char *_ssid;
     const char *_pass;
     WiFiClientSecure *_client;
+    const char* _ap_ssid;
+    const char* _ap_pass;
 
 };
 
