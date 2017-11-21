@@ -32,13 +32,43 @@ AdafruitIO_ESP8266::~AdafruitIO_ESP8266()
 
 void AdafruitIO_ESP8266::_connect()
 {
+
   delay(100);
-  if (networkStatus() < 20) { // only try to connect if ESP8266 isn't already connected
-    WiFi.mode(WIFI_STA); // force ESP8266 into STATION mode (working on AP+STA implementation)
-    WiFi.begin(_ssid, _pass);
-    _status = AIO_NET_DISCONNECTED;
+  //WIFI_STA = 1, WIFI_AP_STA = 3
+  if (_wifi_mode == WIFI_OFF || _wifi_mode == WIFI_AP) {
+    return;
+  }
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_OFF);
+  //delay(10);
+  WiFi.mode(_wifi_mode);
+  WiFi.begin(_ssid, _pass);
+  _status = AIO_NET_DISCONNECTED;
+  delay(100);
+  if (_wifi_mode == WIFI_AP_STA) {
+      if (! _ap_ssid) {
+        return;
+      }
+      if (! _ap_pass) {
+        WiFi.softAP(_ap_ssid);
+      } else {
+        WiFi.softAP(_ap_ssid, _ap_pass);
+      }
+      //_status = AIO_DISCONNECTED;
+      //return;
   }
   delay(100);
+}
+
+bool AdafruitIO_ESP8266::setAP(const char *ap_ssid, const char *ap_pass)
+{
+  if (! ap_ssid) {
+    return 0;
+  } else {
+    _ap_ssid = ap_ssid;
+  }
+  _ap_pass = ap_pass;
+  return 1;
 }
 
 aio_status_t AdafruitIO_ESP8266::networkStatus()
